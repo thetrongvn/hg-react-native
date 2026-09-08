@@ -1,13 +1,10 @@
 import Realm from 'realm';
 
 class BaseService {
-  constructor(
-    realm: Realm
-  ) {
+  protected realm: Realm;
 
+  constructor(realm: Realm) {
     this.realm = realm;
-
-    console.log('[BaseService][Log] - Init');
   }
 }
 

@@ -1,11 +1,11 @@
-interface spacingType {
+interface Spacing {
   borderRadius: number;
   layoutPaddingH: number;
   containerPaddingV: number;
   cardMarginB: number;
 }
 
-interface typeSizesType {
+interface TypeSizes {
   FONT_SIZE_SMALL: number;
   FONT_SIZE_MEDIUM: number;
   FONT_SIZE_LARGE: number;
@@ -14,8 +14,25 @@ interface typeSizesType {
   FONT_WEIGHT_HEAVY: number;
 }
 
-export interface themeType {
-  name: string;
+export const colors = {
+  primary: '#bb873e',
+  secondary: '#f6e5d4',
+  grey: '#acacac',
+  gray: '#5f5f5f',
+  darkGray: '#4d4d4d',
+  lightGray: '#9b9b9b',
+  white: '#ffffff',
+  blue: '#5A81F7',
+  bluish: '#F1F1F7',
+  black: '#000000',
+  green: '#6DD0A3',
+  yellow: '#ffc247',
+  error: '#B00020',
+  accent: '#0071ff',
+};
+
+export interface ThemeTokens {
+  name: 'light' | 'dark';
   color: string;
   primary: string;
   layoutBg: string;
@@ -25,21 +42,19 @@ export interface themeType {
   error: string;
 }
 
-interface themesType {
-  light: themeType;
-  dark: themeType;
+interface Themes {
+  light: ThemeTokens;
+  dark: ThemeTokens;
 }
 
-// Spacing:- Common margins and paddings
-const spacing: spacingType = {
+export const spacing: Spacing = {
   borderRadius: 16,
   layoutPaddingH: 16,
   containerPaddingV: 22,
   cardMarginB: 16,
 };
 
-// Type Sizes:- Font sizes and weights
-const typeSizes: typeSizesType = {
+export const typeSizes: TypeSizes = {
   FONT_SIZE_LARGE: 16,
   FONT_SIZE_MEDIUM: 14,
   FONT_SIZE_SMALL: 12,
@@ -48,46 +63,47 @@ const typeSizes: typeSizesType = {
   FONT_WEIGHT_HEAVY: 700,
 };
 
-const typeVariants = {
+export const typeVariants = {
   titleLarge: {
-    fontFamily: 'Poppins-Bold',
+    fontFamily: 'Lato-Bold',
     fontSize: typeSizes.FONT_SIZE_LARGE,
   },
   titleSmall: {
-    fontFamily: 'Poppins-Bold',
+    fontFamily: 'Lato-Bold',
     fontSize: typeSizes.FONT_SIZE_SMALL,
   },
   bodyMedium: {
-    fontFamily: 'Poppins-Regular',
+    fontFamily: 'Lato-Regular',
     fontSize: typeSizes.FONT_SIZE_MEDIUM,
   },
   bodySmall: {
-    fontFamily: 'Poppins-Regular',
+    fontFamily: 'Lato-Regular',
     fontSize: typeSizes.FONT_SIZE_SMALL,
   },
 };
 
-const themes: themesType = {
+export const themes: Themes = {
   light: {
     name: 'light',
     color: '#695D5D',
-    primary: '#2bbca2',
+    primary: colors.primary,
     layoutBg: '#e0eeec',
     cardBg: '#ffffff',
     cardBorderColor: '#EEECEC',
-    accent: '#0071ff',
-    error: '#B00020',
+    accent: colors.accent,
+    error: colors.error,
   },
   dark: {
     name: 'dark',
     color: '#ffffff',
-    primary: '#2bbca2',
+    primary: colors.primary,
     layoutBg: '#121212',
     cardBg: '#1e1e1e',
     cardBorderColor: '#1A1A1A',
-    accent: '#0071ff',
-    error: '#B00020',
+    accent: colors.accent,
+    error: colors.error,
   },
 };
 
-export {spacing, typeSizes, typeVariants, themes};
+/** @deprecated Use ThemeTokens */
+export type themeType = ThemeTokens;

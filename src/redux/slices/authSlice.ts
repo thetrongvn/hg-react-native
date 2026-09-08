@@ -1,29 +1,33 @@
-import { createSlice } from '@reduxjs/toolkit'
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 
-const initialState = {
+import {AuthUser} from '@src/types/types';
+
+type AuthState = {
+  user: AuthUser | null;
+  isHydrated: boolean;
+};
+
+const initialState: AuthState = {
   user: null,
-  token: null,
-}
+  isHydrated: false,
+};
 
 export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setCredentials: (
-      state,
-      {
-        payload: { user = {}, token },
-      },
-    ) => {
-      console.log('[authSlice] - setCredentials', { user, token });
-      state.token = token;
-      state.user = user;
+    setSession: (state, action: PayloadAction<AuthUser | null>) => {
+      state.user = action.payload;
+    },
+    setHydrated: (state, action: PayloadAction<boolean>) => {
+      state.isHydrated = action.payload;
+    },
+    clearSession: state => {
+      state.user = null;
     },
   },
-})
+});
 
-export const { setCredentials } = authSlice.actions;
+export const {setSession, setHydrated, clearSession} = authSlice.actions;
 
 export default authSlice.reducer;
-
-export const selectAccessToken = (state: any) => state.auth.token;

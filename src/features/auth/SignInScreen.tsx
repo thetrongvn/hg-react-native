@@ -1,93 +1,40 @@
-
 import React from 'react';
 import {
-  View,
+  Image,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  Image
+  View,
 } from 'react-native';
-
-import { authService } from '@core/services';
-
-import { useDispatch } from 'react-redux';
-import { setCredentials } from '@redux/slices/authSlice';
-
-import { Formik } from 'formik';
-import * as Yup from 'yup';
-
+import {Formik} from 'formik';
 import Icon from 'react-native-vector-icons/Feather';
-import { colors } from '@styles';
 
-import { signIn } from '@core/apis';
-import { ROUTES_HOME, ROUTES_APP_NAVIGATOR } from '@constants';
+import {authService} from '@core/services';
+import {setSession} from '@redux/slices/authSlice';
+import {useAppDispatch} from '@redux/store';
+import {colors} from '@theme/theme';
+import i18n from '@i18n';
+import {loginValidationSchema, SignInFormValues} from './loginSchema';
 
 const logo = require('@assets/images/logo.png');
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const initialValues = {
-  username: '',
-  password: ''
-};
+export default function SignInScreen() {
+  const dispatch = useAppDispatch();
 
-const loginValidationSchema = Yup.object().shape({
-  email: Yup
-    .string()
-    .email('Please enter a valid email')
-    .required('Email is required'),
-  password: Yup
-    .string()
-    .min(3, ({ min }) => `Password must be at least ${min} characters`)
-    .required('Password is required'),
-});
-
-export default function SignInView(props) {
-  const dispatch = useDispatch();
-
-  const handleLogin = (values: ValuesType, { setErrors }: any) => {
-    signIn(values)
-      .then(res => {
-        const { uid, idToken, refreshToken } = res.data;
-        let expiresAt: Date | undefined;
-        console.log('[SignInView] - Login response:', idToken);
-
-        if (idToken) {
-          (async () => {
-            await authService.saveCredentials({
-              type: 'BearerToken',
-              uid,
-              idToken,
-              refreshToken,
-            }).then(() => {
-              console.log('[SignInView] - Credentials saved successfully');
-              dispatch(setCredentials({
-                user: {
-                  uid: uid,
-                  email: values.email,
-                },
-                token: idToken,
-              }));
-
-              props.navigation.reset({
-                index: 0,
-                routes: [{ name: ROUTES_APP_NAVIGATOR }],
-              });
-            });
-          })();
-        }
-      })
-      .catch(e => {
-        if (e.response?.data?.errors) {
-          let result = transformToFormikErrors(e.response.data.errors);
-          setErrors(result);
-        }
-      });
-  };
-
-  const handleForgotPassword = () => {
-    // Handle forgot password logic here
-    console.log('Forgot Password Pressed');
+  const handleLogin = async (
+    values: SignInFormValues,
+    {setErrors}: {setErrors: (errors: Record<string, string>) => void},
+  ) => {
+    try {
+      const user = await authService.signIn(values.email, values.password);
+      dispatch(setSession(user));
+    } catch (error) {
+      const fieldErrors = authService.mapSignInError(error);
+      if (fieldErrors) {
+        setErrors(fieldErrors);
+      }
+    }
   };
 
   return (
@@ -95,9 +42,8 @@ export default function SignInView(props) {
       <Image source={logo} style={styles.logo} />
       <Formik
         validationSchema={loginValidationSchema}
-        initialValues={{ email: '', password: '' }}
-        onSubmit={handleLogin}
-      >
+        initialValues={{email: '', password: ''}}
+        onSubmit={handleLogin}>
         {({
           handleChange,
           handleBlur,
@@ -112,46 +58,48 @@ export default function SignInView(props) {
               <Icon name="mail" size={25} style={styles.icon} />
               <TextInput
                 style={styles.input}
-                placeholder="Email"
+                placeholder={i18n.t('signIn.email')}
                 keyboardType="email-address"
+                autoCapitalize="none"
                 onChangeText={handleChange('email')}
                 onBlur={handleBlur('email')}
                 value={values.email}
               />
             </View>
-            {errors.email && touched.email && (
-              <Icon name="camera" size={30} color="#333" />
-            )}
+            {errors.email && touched.email ? (
+              <Text style={styles.errorText}>{errors.email}</Text>
+            ) : null}
             <View style={styles.inputContainer}>
               <Icon name="lock" size={25} style={styles.icon} />
               <TextInput
                 style={styles.input}
-                placeholder="Password"
+                placeholder={i18n.t('signIn.password')}
                 secureTextEntry
                 onChangeText={handleChange('password')}
                 onBlur={handleBlur('password')}
                 value={values.password}
               />
             </View>
-            {errors.password && touched.password && (
+            {errors.password && touched.password ? (
               <Text style={styles.errorText}>{errors.password}</Text>
-            )}
-            <TouchableOpacity onPress={() => handleForgotPassword()}>
-              <Text style={styles.forgotPassword}>Forgot Password?</Text>
+            ) : null}
+            <TouchableOpacity>
+              <Text style={styles.forgotPassword}>
+                {i18n.t('signIn.forgotPassword')}
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.button}
-              onPress={handleSubmit}
-              disabled={!isValid}
-            >
-              <Text style={styles.buttonText}>Login</Text>
+              onPress={() => handleSubmit()}
+              disabled={!isValid}>
+              <Text style={styles.buttonText}>{i18n.t('signIn.login')}</Text>
             </TouchableOpacity>
           </>
         )}
       </Formik>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -166,12 +114,6 @@ const styles = StyleSheet.create({
     width: 200,
     resizeMode: 'contain',
     marginBottom: 20,
-  },
-  title: {
-    fontSize: 32,
-    marginBottom: 40,
-    fontWeight: 'bold',
-    color: 'black',
   },
   inputContainer: {
     flexDirection: 'row',
@@ -208,14 +150,8 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
   },
-  signUp: {
-    color: '#000',
-  },
-  signUpLink: {
-    color: '#1E90FF',
-  },
   errorText: {
-    color: 'red',
+    color: colors.error,
     alignSelf: 'flex-start',
     marginBottom: 10,
   },

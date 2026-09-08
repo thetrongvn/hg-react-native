@@ -1,9 +1,9 @@
 import * as React from 'react';
-import {themes, themeType} from './theme';
+import {themes, ThemeTokens} from './theme';
 
 export interface ThemeContextInterface {
-  theme: themeType;
-  setTheme: (value: themeType) => void;
+  theme: ThemeTokens;
+  setTheme: (value: ThemeTokens) => void;
 }
 
 interface ThemeProviderInterface {
@@ -14,7 +14,7 @@ const ThemeContext = React.createContext({} as ThemeContextInterface);
 
 export const ThemeProvider = ({
   children,
-}: ThemeProviderInterface): JSX.Element => {
+}: ThemeProviderInterface): React.ReactElement => {
   const [theme, setTheme] = React.useState(themes.light);
   return (
     <ThemeContext.Provider value={{theme, setTheme}}>
@@ -25,7 +25,6 @@ export const ThemeProvider = ({
 
 export const useTheme = () => {
   const state = React.useContext(ThemeContext);
-
   const {theme, setTheme} = state;
 
   const toggleTheme = (v: boolean) => {

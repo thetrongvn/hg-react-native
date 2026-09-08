@@ -1,28 +1,36 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 
-import colors from '@styles/colors';
+import {colors} from '@theme/theme';
 
-const HeaderBar = ({ title }: { title: string }) => {
+type Props = {
+  title: string;
+  showBack?: boolean;
+};
+
+const HeaderBar = ({title, showBack = true}: Props) => {
   const navigation = useNavigation();
 
   return (
     <View style={styles.header}>
-      <TouchableOpacity
-        onPress={() => {
-          navigation.goBack();
-        }}
-        style={styles.backButton}
-      >
-        <Icon name="chevron-back-outline" size={28} color="#555" />
-      </TouchableOpacity>
+      {showBack ? (
+        <TouchableOpacity
+          onPress={() => {
+            navigation.goBack();
+          }}
+          style={styles.backButton}>
+          <Icon name="chevron-back-outline" size={28} color="#555" />
+        </TouchableOpacity>
+      ) : (
+        <View style={styles.backButton} />
+      )}
 
       <View style={styles.titleContainer}>
         <Text style={styles.headerTitle}>{title}</Text>
       </View>
-
+      <View style={styles.backButton} />
     </View>
   );
 };
@@ -37,12 +45,13 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   backButton: {
+    width: 28,
     marginVertical: 0,
   },
   titleContainer: {
     flex: 1,
     alignItems: 'center',
-    marginVertical: 0
+    marginVertical: 0,
   },
   headerTitle: {
     fontSize: 20,

@@ -1,29 +1,29 @@
-import { createSlice } from '@reduxjs/toolkit';
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+
+type HomeState = {
+  value: number;
+};
+
+const initialState: HomeState = {
+  value: 0,
+};
 
 export const homeSlice = createSlice({
   name: 'home',
-  initialState: {
-    value: 0,
-  },
+  initialState,
   reducers: {
-    increment: (state) => {
+    increment: state => {
       state.value += 1;
     },
-    decrement: (state) => {
+    decrement: state => {
       state.value -= 1;
     },
-    incrementByAmount: (state, action) => {
-      state.value += action.payload
+    incrementByAmount: (state, action: PayloadAction<number>) => {
+      state.value += action.payload;
     },
   },
 });
 
-export const { increment, decrement, incrementByAmount } = homeSlice.actions;
+export const {increment, decrement, incrementByAmount} = homeSlice.actions;
 
-export const incrementAsync = (amount) => (dispatch) => {
-  setTimeout(() => {
-    dispatch(incrementByAmount(amount))
-  }, 1000)
-}
-
-export const selectCount = (state) => state.home.value;
+export default homeSlice.reducer;

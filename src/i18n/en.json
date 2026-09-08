@@ -1,0 +1,43 @@
+{
+  "welcome": {
+    "title": "Welcome to the App",
+    "subtitle": "To access the app features, please log in to continue.",
+    "signIn": "Sign In"
+  },
+  "signIn": {
+    "title": "Sign In",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "login": "Login",
+    "invalidEmail": "Please enter a valid email",
+    "emailRequired": "Email is required",
+    "passwordMin": "Password must be at least %{min} characters",
+    "passwordRequired": "Password is required"
+  },
+  "tabs": {
+    "home": "Home",
+    "notifications": "Alerts",
+    "profile": "Me"
+  },
+  "home": {
+    "title": "Redux Home",
+    "counter": "Counter: %{count}"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No Notifications"
+  },
+  "profile": {
+    "privacy": "Privacy",
+    "purchaseHistory": "Purchase History",
+    "help": "Help & Support",
+    "settings": "Settings",
+    "signOut": "Sign Out"
+  },
+  "bootstrap": {
+    "loading": "Starting…",
+    "errorTitle": "Could not start the app",
+    "retry": "Retry"
+  }
+}

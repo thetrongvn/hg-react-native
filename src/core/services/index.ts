@@ -1,12 +1,19 @@
-import realm from '../database';
+import Realm from 'realm';
+
 import SettingsService from './settingsService';
-import AuthService from './authService';
-console.log('[Realm][Log] - database path: ', realm.path);
+import {authService} from './authService';
 
-export const settingsService = new SettingsService(
-  realm
-);
+let settingsService: SettingsService | null = null;
 
-export const authService = new AuthService(
-  realm
-);
+export function initServices(realm: Realm): void {
+  settingsService = new SettingsService(realm);
+}
+
+export function getSettingsService(): SettingsService {
+  if (!settingsService) {
+    throw new Error('Services not initialized. Call initServices() from bootstrap.');
+  }
+  return settingsService;
+}
+
+export {authService};

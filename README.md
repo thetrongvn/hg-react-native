@@ -1,116 +1,102 @@
 # hg-react-native
 
-`hg-react-native` is a scalable and production-ready React Native starter kit designed to help you bootstrap mobile apps in just 30 minutes.
-
-This starter template comes with powerful default modules and a clean project structure, making it perfect for launching new projects or maintaining long-term codebases.
+`hg-react-native` is a production-oriented React Native starter: session-gated navigation, a bootstrap status machine, and a service I/O boundary so product features can land without rewriting the shell.
 
 ## Features
 
-- React Native Template – A pre-configured setup ready out-of-the-box.
-- Scalable Project Architecture – Designed with long-term maintainability in mind.
-- Fast Setup – Get a professional-grade project structure in under 30 minutes.
+- React Native 0.83 (New Architecture, Hermes, TypeScript)
+- Session-gated navigation (Auth stack vs App tabs)
+- Bootstrap status machine (`idle | loading | ready | error`), independent of auth
+- API layer (Axios + env-based base URL)
+- Realm for app settings / offline data
+- Keychain for tokens (never Realm or Redux)
+- Redux Toolkit for serializable UI/session state
+- Theme provider, i18n (`en` / `vi`)
 
-## Modular Codebase – Built-in base modules like
-
-- API layer (with environment-based switching)
-- Database layer using Realm
-- State management with Redux (ready to scale with middleware and slices)
-
-### Environment Separation – Automatic environment configs using .env files
-
-- Custom CLI Scripts – Simplify environment switching, builds, and automation tasks.
-
-- Organized Folder Structure – Clean separation of concerns for features, UI, and business logic.
-
-#### Project Structure
+## Project structure
 
 ```
 hg-react-native/
 ├── src/
-│   ├── components/
-│   ├── constants/
+│   ├── app/              # AppProviders, RootNavigator, splash/error
+│   ├── hooks/            # useBootstrap (later: useEngine)
+│   ├── navigation/       # AuthStack, AppTabs, typed routes
+│   ├── features/         # auth, home, profile, notifications
 │   ├── core/
-│   ├── features/
+│   │   ├── api/          # Axios client + endpoints
+│   │   ├── db/           # lazy Realm open/migrate
+│   │   ├── models/       # Realm schemas
+│   │   └── services/     # screens talk here, not to Axios/Realm/Keychain
+│   ├── redux/            # store + slices
+│   ├── theme/            # tokens + ThemeProvider
 │   ├── i18n/
-│   ├── hooks/
-│   └── launch/
-│   ├── navigator/
-│   ├── redux/
-│   └── translations/
-│   ├── types/
-│   └── utils/
-│   ├── config.ts
-├── vendors/
+│   ├── components/
+│   └── utils/            # Keychain helpers
 ├── .env.example
 └── ...
 ```
 
-## Getting Started
+Layer contract:
 
-#### Clone the repo
+```
+Screen → hook or service
+service → api client and/or Realm and/or Keychain
+api → Axios instance only
+slice → serializable UI/session state only
+```
+
+## Getting started
+
+### Clone the repo
 
 ```
 git clone https://github.com/hgq287/hg-react-native.git
 cd hg-react-native
 ```
 
-#### Install dependencies
+### Install dependencies
 
 ```bash
 npm install
 ```
 
-or 
+iOS pods:
 
 ```bash
-yarn
+npm run setup:ios
 ```
 
-#### Set up environment
+### Set up environment
 
 ```
 cp .env.example .env
 ```
 
-then, modify .env as needed (API base URL, environment keys, etc.)
+Then edit `.env` (API base URL, namespace, Realm schema version).
 
-#### Run the app
-
-```bash
-npm run ios      # for iOS
-npm run android  # for Android
-```
-
-or 
+### Run the app
 
 ```bash
-yarn ios  # for iOS
-yarn android  # for android
-
+npm run ios
+npm run android
 ```
 
-#### Run unit-tests
+### Tests
 
 ```bash
-npx jest
+npm test
 ```
 
-## What’s Inside
+## What’s inside
 
-- React Native (latest version)
-- React Navigation
-- Realm Database
-- Axios for API requests
-- Custom environment loader
-- TypeScript ready (if applicable)
-
-## Use Cases
-
-- Kickstart new React Native apps with clean architecture
-- MVP projects for startups
-- Maintainable long-term codebases
-- Internal tools and mobile dashboards
+- React Native 0.83
+- React Navigation 7 (native stack + tabs)
+- Realm
+- Axios
+- react-native-config
+- react-native-keychain
+- TypeScript
 
 ## License
 
-MIT License – use it freely and feel free to credit if you find it helpful 🙌
+MIT License

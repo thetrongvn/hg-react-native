@@ -5,49 +5,28 @@ import {
   Image,
   TouchableOpacity,
   StyleSheet,
-  ScrollView
+  ScrollView,
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Feather';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import { useSelector } from 'react-redux';
-import { selectUser } from '@redux/slices/userSlice';
-
-import { colors, fonts } from '@styles';
+import {authService} from '@core/services';
+import {selectProfile, useAppSelector} from '@redux/store';
+import {useTheme} from '@theme/useTheme';
+import i18n from '@i18n';
 
 const profilePic = require('@assets/images/profile-pic.png');
-const ProfileScreen = () => {
-  const user = useSelector(selectUser);
 
-  return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.headerContainer}>
-
-      </View>
-
-      <Image
-        source={user.avatar || profilePic}
-        style={styles.profilePic}
-      />
-
-      <Text style={styles.name}>{user.displayName}</Text>
-      <Text style={styles.username}>@{user.username}</Text>
-      <Text style={styles.bio}>
-        {user.bio}
-      </Text>
-
-      <Option icon={<Ionicons name="lock-closed-outline" size={20} />} label="Privacy" />
-      <Option icon={<Ionicons name="time-outline" size={20} />} label="Purchase History" />
-      <Option icon={<MaterialIcons name="help-outline" size={20} />} label="Help & Support" />
-      <Option icon={<Ionicons name="settings-outline" size={20} />} label="Settings" />
-    </ScrollView>
-  );
+type OptionProps = {
+  icon: React.ReactNode;
+  label: string;
+  onPress?: () => void;
 };
 
-const Option = ({ icon, label }) => (
-  <TouchableOpacity style={styles.option}>
+const Option = ({icon, label, onPress}: OptionProps) => (
+  <TouchableOpacity style={styles.option} onPress={onPress}>
     <View style={styles.optionContent}>
       {icon}
       <Text style={styles.optionText}>{label}</Text>
@@ -55,6 +34,49 @@ const Option = ({ icon, label }) => (
     <Icon name="chevron-right" size={20} color="#999" />
   </TouchableOpacity>
 );
+
+export default function ProfileScreen() {
+  const user = useAppSelector(selectProfile);
+  const {theme} = useTheme();
+
+  const handleSignOut = () => {
+    authService.signOut();
+  };
+
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      <View />
+
+      <Image source={user.avatar || profilePic} style={styles.profilePic} />
+
+      <Text style={styles.name}>{user.displayName}</Text>
+      <Text style={styles.username}>@{user.username}</Text>
+      <Text style={styles.bio}>{user.bio}</Text>
+
+      <Option
+        icon={<Ionicons name="lock-closed-outline" size={20} />}
+        label={i18n.t('profile.privacy')}
+      />
+      <Option
+        icon={<Ionicons name="time-outline" size={20} />}
+        label={i18n.t('profile.purchaseHistory')}
+      />
+      <Option
+        icon={<MaterialIcons name="help-outline" size={20} />}
+        label={i18n.t('profile.help')}
+      />
+      <Option
+        icon={<Ionicons name="settings-outline" size={20} />}
+        label={i18n.t('profile.settings')}
+      />
+      <Option
+        icon={<Ionicons name="log-out-outline" size={20} color={theme.error} />}
+        label={i18n.t('profile.signOut')}
+        onPress={handleSignOut}
+      />
+    </ScrollView>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -73,12 +95,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 10,
     elevation: 6,
-  },
-  socialIcons: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    width: '70%',
-    marginVertical: 15,
   },
   name: {
     fontWeight: 'bold',
@@ -114,5 +130,3 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
-export default ProfileScreen;

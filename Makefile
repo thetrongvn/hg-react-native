@@ -1,6 +1,6 @@
-# Makefile for React Native
+# Makefile for React Native (npm)
 
-.PHONY: ios android clean node_modules reinstall pods start
+.PHONY: ios android clean reinstall pods start reset-cache
 
 ## Run the app on iOS simulator
 ios:
@@ -10,11 +10,9 @@ ios:
 android:
 	npx react-native run-android
 
-# Stop Metro / build processes
-# Clear Metro bundler cache
+## Clear Metro bundler cache
 reset-cache:
 	npx react-native start --reset-cache
-
 
 ## Start the Metro bundler only
 start:
@@ -23,7 +21,7 @@ start:
 ## Clean node_modules and lock files
 clean:
 	rm -rf node_modules
-	rm -f yarn.lock package-lock.json
+	rm -f package-lock.json
 	rm -rf ios/Pods ios/Podfile.lock
 
 ## Clean and reinstall everything (node_modules + pods)

@@ -1,0 +1,43 @@
+{
+  "welcome": {
+    "title": "Chào mừng đến với ứng dụng",
+    "subtitle": "Đăng nhập để tiếp tục sử dụng các tính năng.",
+    "signIn": "Đăng nhập"
+  },
+  "signIn": {
+    "title": "Đăng nhập",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "forgotPassword": "Quên mật khẩu?",
+    "login": "Đăng nhập",
+    "invalidEmail": "Vui lòng nhập email hợp lệ",
+    "emailRequired": "Email là bắt buộc",
+    "passwordMin": "Mật khẩu phải có ít nhất %{min} ký tự",
+    "passwordRequired": "Mật khẩu là bắt buộc"
+  },
+  "tabs": {
+    "home": "Trang chủ",
+    "notifications": "Thông báo",
+    "profile": "Tôi"
+  },
+  "home": {
+    "title": "Redux Home",
+    "counter": "Bộ đếm: %{count}"
+  },
+  "notifications": {
+    "title": "Thông báo",
+    "empty": "Không có thông báo"
+  },
+  "profile": {
+    "privacy": "Quyền riêng tư",
+    "purchaseHistory": "Lịch sử mua hàng",
+    "help": "Trợ giúp & hỗ trợ",
+    "settings": "Cài đặt",
+    "signOut": "Đăng xuất"
+  },
+  "bootstrap": {
+    "loading": "Đang khởi động…",
+    "errorTitle": "Không thể khởi động ứng dụng",
+    "retry": "Thử lại"
+  }
+}

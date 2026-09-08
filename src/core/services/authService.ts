@@ -1,100 +1,80 @@
-import BaseService from './baseService';
-import Credentials from '../models/credentials';
+import axios from 'axios';
 
-class AuthService extends BaseService {
-  constructor(
-    realm: Realm
-  ) {
+import {signIn as signInRequest} from '../api/auth';
+import {sessionEvents} from '../sessionEvents';
+import {AuthUser} from '@src/types/types';
+import {
+  clearSessionSecrets,
+  getSecureValue,
+  KEYCHAIN_KEYS,
+  setSecureValue,
+} from '@utils/keyChain';
 
-    super(realm);
+export type FormikFieldErrors = Record<string, string>;
 
-    console.log('[AuthService][Log] - Init');
-  }
-
-  saveCredentials = async (data: {
-    type: string,
-    uid?: string,
-    idToken?: string,
-    refreshToken?: string,
-    apiKey?: string,
-    username?: string,
-    password?: string,
-    deviceId?: string,
-    signature?: string
-  }): Promise<boolean> => {
-    try {
-      let expiresAt: Date | undefined = undefined;
-      if (data.idToken) {
-        // Set expiration to 1 hour from now
-        expiresAt = new Date(Date.now() + 60 * 60 * 1000);
-      }
-      const objects = this.realm?.objects<Credentials>('Credentials');
-
-      this.realm?.write(() => {
-        if (objects?.isEmpty()) {
-          console.log('[AuthService][saveCredentials] - Creating new Credentials object', data);
-          this.realm?.create(
-            'Credentials',
-            Credentials.generate({
-              ...data,
-              expiresAt
-            })
-          );
-        } else {
-          const object = objects?.at(0);
-          if (object) {
-            object.type = data.type;
-            object.uid = data.uid;
-            object.idToken = data.idToken;
-            object.refreshToken = data.refreshToken;
-            object.apiKey = data.apiKey;
-            object.username = data.username;
-            object.password = data.password;
-            object.deviceId = data.deviceId;
-            object.signature = data.signature;
-            object.expiresAt = expiresAt;
-            object.updatedAt = new Date();
-          }
-        }
-      });
-
-      return true;
-    } catch (e) {
-      console.error('[AuthService][saveCredentials] Error:', e);
-      return false;
-    }
-  };
-
-  loadCredentials = async (): Promise<Credentials | undefined> => {
-    try {
-      const objects = this.realm?.objects<Credentials>('Credentials');
-      return objects?.isEmpty() ? undefined : objects.at(0);
-    } catch (e) {
-      console.error('[AuthService][loadCredentials] Error:', e);
-      return undefined;
-    }
-  };
-
-  checkForAuthorized = async (): Promise<any> => {
-    const cred = await this.loadCredentials();
-
-    console.log('[AuthService][checkForAuthorized] - Credentials:', cred);
-
-    if (cred && cred.idToken) {
-      return {
-        user: { uid: cred.uid },
-        credentials: {
-          type: cred.type,
-          idToken: cred.idToken,
-          refreshToken: cred.refreshToken,
-          expiresAt: cred.expiresAt
-        }
-      };
-    } else {
-      throw new Error('Unauthorized');
-    }
-  };
-
+export function transformToFormikErrors(
+  errors: Record<string, string | string[]>,
+): FormikFieldErrors {
+  return Object.fromEntries(
+    Object.entries(errors).map(([key, value]) => [
+      key,
+      Array.isArray(value) ? value[0] : value,
+    ]),
+  );
 }
 
+class AuthService {
+  hydrate = async (): Promise<AuthUser | null> => {
+    const accessToken = await getSecureValue(KEYCHAIN_KEYS.accessToken);
+    const userJson = await getSecureValue(KEYCHAIN_KEYS.sessionUser);
+    if (!accessToken || !userJson) {
+      return null;
+    }
+    try {
+      return JSON.parse(userJson) as AuthUser;
+    } catch {
+      return null;
+    }
+  };
+
+  signIn = async (email: string, password: string): Promise<AuthUser> => {
+    const data = await signInRequest({email, password});
+    const user: AuthUser = {
+      uid: data.uid,
+      email: data.email ?? email,
+    };
+
+    await setSecureValue(KEYCHAIN_KEYS.accessToken, data.idToken);
+    if (data.refreshToken) {
+      await setSecureValue(KEYCHAIN_KEYS.refreshToken, data.refreshToken);
+    }
+    await setSecureValue(KEYCHAIN_KEYS.sessionUser, JSON.stringify(user));
+
+    return user;
+  };
+
+  signOut = async (): Promise<void> => {
+    await clearSessionSecrets();
+    sessionEvents.notifyUnauthorized();
+  };
+
+  mapSignInError = (error: unknown): FormikFieldErrors | null => {
+    if (
+      axios.isAxiosError(error) &&
+      error.response?.data &&
+      typeof error.response.data === 'object' &&
+      'errors' in error.response.data
+    ) {
+      const payload = error.response.data as {
+        errors?: Record<string, string | string[]>;
+      };
+      if (payload.errors) {
+        return transformToFormikErrors(payload.errors);
+      }
+    }
+    return null;
+  };
+}
+
+export const authService = new AuthService();
 export default AuthService;
