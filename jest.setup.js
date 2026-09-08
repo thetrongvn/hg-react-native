@@ -1,4 +1,5 @@
 jest.mock('react-native-keychain', () => ({
+  ACCESSIBLE: {AFTER_FIRST_UNLOCK: 'AccessibleAfterFirstUnlock'},
   setGenericPassword: jest.fn(async () => true),
   getGenericPassword: jest.fn(async () => false),
   resetGenericPassword: jest.fn(async () => true),

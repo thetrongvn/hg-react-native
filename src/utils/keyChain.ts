@@ -1,23 +1,45 @@
 import * as Keychain from 'react-native-keychain';
 
+const defaultOptions = {
+  accessible: Keychain.ACCESSIBLE.AFTER_FIRST_UNLOCK,
+};
+
 export async function setSecureValue(
   key: string,
   value: string,
 ): Promise<boolean> {
-  const result = await Keychain.setGenericPassword(key, value, {service: key});
-  return Boolean(result);
+  try {
+    const result = await Keychain.setGenericPassword(key, value, {
+      service: key,
+      ...defaultOptions,
+    });
+    return Boolean(result);
+  } catch {
+    return false;
+  }
 }
 
 export async function getSecureValue(key: string): Promise<string | null> {
-  const result = await Keychain.getGenericPassword({service: key});
-  if (result) {
-    return result.password;
+  try {
+    const result = await Keychain.getGenericPassword({
+      service: key,
+      ...defaultOptions,
+    });
+    if (result) {
+      return result.password;
+    }
+    return null;
+  } catch {
+    return null;
   }
-  return null;
 }
 
 export async function removeSecureValue(key: string): Promise<boolean> {
-  return Keychain.resetGenericPassword({service: key});
+  try {
+    return Keychain.resetGenericPassword({service: key});
+  } catch {
+    return false;
+  }
 }
 
 export const KEYCHAIN_KEYS = {
