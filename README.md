@@ -87,6 +87,39 @@ npm run android
 npm test
 ```
 
+Local quality gate (same checks as CI):
+
+```bash
+make ci
+```
+
+## CI/CD
+
+GitHub Actions runs on every pull request and every push to `main`.
+
+| Event | Quality (lint, `tsc`, Jest) | Native compile |
+|---|---|---|
+| Pull request | Yes | No |
+| Push to `main` | Yes, then Android + iOS in parallel | Debug APK artifact + iOS Simulator build |
+
+Quality is the merge gate. Require the **Quality** check in branch protection on `main`. Native jobs are compile smokes after merge: they prove Gradle/Xcode still link, they do **not** ship to Play or TestFlight.
+
+How to run it:
+
+1. Open a PR -> Quality must pass.
+2. Merge to `main` -> Quality runs again, then Android `assembleDebug` and an unsigned iOS Simulator `xcodebuild`.
+3. Download `android-debug-apk` from the Actions run if you need a smoke APK.
+
+iOS CI installs CocoaPods **1.17.0** to match `ios/Podfile.lock`. It does not use `bundle exec pod` yet: `Gemfile.lock` still pins 1.15.2. Do not run `npm run setup:ios` in CI; that script deletes the lockfile.
+
+What this pipeline deliberately does not do (needs secrets that are not in the repo):
+
+- Signed Play AAB / App Store IPA
+- Fastlane, TestFlight, internal testing tracks
+- Version bumps or changelog automation
+
+When those exist, add a `deploy` job behind a GitHub Environment (`production`) that runs only after the compile jobs, using Fastlane and repository secrets (`PLAY_SERVICE_ACCOUNT`, `ASC_KEY`, upload keystore). Do not put those secrets in `.env`.
+
 ## What’s inside
 
 - React Native 0.83

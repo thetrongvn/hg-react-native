@@ -6,9 +6,11 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "setup:ios": "cd ios && rm -rf Pods && rm -f Podfile.lock && pod install && cd ..",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings 0",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "test:ci": "jest --ci --watchAll=false",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@react-native/new-app-screen": "0.83.1",

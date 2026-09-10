@@ -1,6 +1,6 @@
 # Makefile for React Native (npm)
 
-.PHONY: ios android clean reinstall pods start reset-cache
+.PHONY: ios android clean reinstall pods start reset-cache ci
 
 ## Run the app on iOS simulator
 ios:
@@ -32,3 +32,9 @@ reinstall: clean
 ## Run pod install for iOS
 pods:
 	cd ios && pod install
+
+## Same quality gate as GitHub Actions (lint, types, unit tests)
+ci:
+	npm run lint
+	npm run typecheck
+	npm run test:ci

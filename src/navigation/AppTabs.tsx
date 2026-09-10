@@ -73,11 +73,7 @@ export default function AppTabs() {
               </View>
             ),
             tabBarLabel: ({focused}) => (
-              <Text
-                style={{
-                  fontSize: 12,
-                  color: focused ? colors.primary : colors.gray,
-                }}>
+              <Text style={focused ? styles.tabLabelFocused : styles.tabLabel}>
                 {item.name}
               </Text>
             ),
@@ -92,5 +88,13 @@ const styles = StyleSheet.create({
   iconWrap: {
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  tabLabel: {
+    fontSize: 12,
+    color: colors.gray,
+  },
+  tabLabelFocused: {
+    fontSize: 12,
+    color: colors.primary,
   },
 });
